@@ -70,10 +70,8 @@ class ScreenManager {
     }
 
     showScreen(screenName) {
-        // Clear any existing timeouts and intervals
+        // Clear any existing timeouts
         this.clearAuthTimeout();
-        this.stopNFCPolling();
-        // Don't stop payment polling - it runs on both welcome and auth screens
 
         // Hide all screens
         document.querySelectorAll('.screen').forEach(screen => {
@@ -89,7 +87,8 @@ class ScreenManager {
 
         // Screen-specific actions
         if (screenName === 'welcome') {
-            // Start payment polling on welcome screen
+            // Start both NFC and payment polling on welcome screen
+            this.startNFCPolling();
             this.startPaymentPolling();
         } else if (screenName === 'auth') {
             this.generateQRCode();
@@ -97,6 +96,9 @@ class ScreenManager {
             this.startNFCPolling();
             this.startPaymentPolling();
         } else if (screenName === 'auth-failed') {
+            // Stop polling on error screen
+            this.stopNFCPolling();
+            this.stopPaymentPolling();
             // Auto-return to welcome after 3 seconds
             setTimeout(() => {
                 if (this.currentScreen === 'auth-failed') {
@@ -104,7 +106,8 @@ class ScreenManager {
                 }
             }, 3000);
         } else if (screenName === 'ready') {
-            // Stop polling when on ready screen
+            // Stop all polling when on ready screen
+            this.stopNFCPolling();
             this.stopPaymentPolling();
         }
 
@@ -150,6 +153,9 @@ class ScreenManager {
     }
 
     startNFCPolling() {
+        // Clear any existing interval first
+        this.stopNFCPolling();
+
         // Poll for NFC events every 500ms
         this.nfcPollInterval = setInterval(async () => {
             try {
@@ -168,6 +174,8 @@ class ScreenManager {
                 console.error('NFC polling error:', error);
             }
         }, 500);
+
+        console.log('Started NFC polling');
     }
 
     stopNFCPolling() {
@@ -178,6 +186,9 @@ class ScreenManager {
     }
 
     startPaymentPolling() {
+        // Clear any existing interval first
+        this.stopPaymentPolling();
+
         // Poll payment portal for exploit success every 1 second
         this.paymentPollInterval = setInterval(async () => {
             try {
@@ -190,7 +201,6 @@ class ScreenManager {
                 }
             } catch (error) {
                 // Silently ignore errors (VPS might not be reachable)
-                console.log('Payment portal polling...', error.message);
             }
         }, 1000);
 

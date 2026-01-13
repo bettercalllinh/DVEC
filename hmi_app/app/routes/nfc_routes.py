@@ -39,7 +39,7 @@ def validate_uid(uid):
 def nfc_event_callback(uid, is_valid):
     """
     Callback function called by NFCReader when a card is detected.
-    Pushes event to the queue for frontend polling.
+    Pushes event to the queue for frontend polling and emits via WebSocket.
     """
     global nfc_event_queue
     event = {
@@ -47,6 +47,14 @@ def nfc_event_callback(uid, is_valid):
         "uid": uid
     }
     nfc_event_queue.append(event)
+
+    # Also emit via WebSocket for real-time updates
+    try:
+        from app import socketio
+        socketio.emit('nfc_result', event)
+        print(f"[NFC] Emitted event via WebSocket: {event}")
+    except Exception as e:
+        print(f"[NFC] WebSocket emit failed: {e}")
 
 @bp.route('/poll', methods=['GET'])
 def poll_nfc():
@@ -60,16 +68,16 @@ def poll_nfc():
 @bp.route('/simulate', methods=['POST'])
 def simulate_nfc():
     """Simulate NFC card swipe for testing"""
-    global nfc_event_queue
     data = request.get_json() or {}
     uid = data.get('uid', '')
 
-    if validate_uid(uid):
-        nfc_event_queue.append({"type": "valid", "uid": uid.upper()})
-        return jsonify({"status": "ok", "valid": True, "uid": uid.upper()})
-    else:
-        nfc_event_queue.append({"type": "invalid", "uid": uid.upper() if uid else "EMPTY"})
-        return jsonify({"status": "ok", "valid": False, "uid": uid.upper() if uid else "EMPTY"})
+    is_valid = validate_uid(uid)
+    uid_str = uid.upper() if uid else "EMPTY"
+
+    # Use the callback which handles both queue and WebSocket
+    nfc_event_callback(uid_str, is_valid)
+
+    return jsonify({"status": "ok", "valid": is_valid, "uid": uid_str})
 
 @bp.route('/auth', methods=['POST'])
 def nfc_auth():
