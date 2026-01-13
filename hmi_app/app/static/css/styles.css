@@ -1,0 +1,305 @@
+/* Google Fonts - Professional EV Charger Vendor Style */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #ffffff;
+    overflow: hidden;
+    /* Optimized for 1024x600 7-inch display */
+    font-size: 18px;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    max-width: 1024px;
+    max-height: 600px;
+    margin: 0 auto;
+}
+
+/* Screen Base Styles */
+.screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    cursor: default;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Welcome Screen */
+#screen-welcome {
+    cursor: pointer;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 30px;
+}
+
+.logo {
+    height: 70px;
+    object-fit: contain;
+}
+
+.logo-fpt {
+    height: 55px;
+}
+
+.logo-sas {
+    height: 65px;
+}
+
+.main-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.tap-hint {
+    font-size: 22px;
+    font-weight: 400;
+    color: #888;
+    animation: pulse-text 2s infinite;
+}
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Authentication Screen */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+}
+
+.auth-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.auth-icon {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+}
+
+#qr-code {
+    width: 160px;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+}
+
+#qr-code canvas, #qr-code img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.auth-text {
+    font-size: 26px;
+    font-weight: 500;
+    color: #333;
+}
+
+.auth-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-divider span {
+    font-size: 28px;
+    font-weight: 400;
+    color: #999;
+}
+
+/* Timeout Progress Bar */
+.timeout-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: #e8e8e8;
+}
+
+.timeout-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    width: 100%;
+    transition: width 0.1s linear;
+}
+
+/* Authentication Failed Screen */
+.status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.status-container.failed {
+    color: #dc2626;
+}
+
+.status-container.success {
+    color: #16a34a;
+}
+
+.status-icon {
+    font-size: 100px;
+    line-height: 1;
+}
+
+.status-container h2 {
+    font-size: 46px;
+    font-weight: 700;
+}
+
+.status-container p {
+    font-size: 24px;
+    font-weight: 400;
+    color: #666;
+}
+
+/* Ready to Charge Screen */
+.charging-icon {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bolt-icon {
+    width: 100%;
+    height: 100%;
+    animation: bolt-pulse 1.5s infinite;
+}
+
+@keyframes bolt-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.charging-animation {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-top: 10px;
+}
+
+.pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: rgba(22, 163, 74, 0.25);
+    border-radius: 50%;
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design for 1024x600 */
+@media (max-height: 650px) {
+    .logo-container {
+        margin-bottom: 20px;
+        gap: 40px;
+    }
+
+    .logo {
+        height: 55px;
+    }
+
+    .logo-fpt {
+        height: 45px;
+    }
+
+    .logo-sas {
+        height: 55px;
+    }
+
+    .main-title {
+        font-size: 38px;
+        margin-bottom: 15px;
+    }
+
+    .tap-hint {
+        font-size: 20px;
+    }
+
+    .auth-container {
+        gap: 60px;
+    }
+
+    .auth-icon {
+        width: 120px;
+        height: 120px;
+    }
+
+    #qr-code {
+        width: 140px;
+        height: 140px;
+    }
+
+    .auth-text {
+        font-size: 22px;
+    }
+
+    .status-container h2 {
+        font-size: 40px;
+    }
+
+    .status-container p {
+        font-size: 22px;
+    }
+
+    .charging-icon {
+        width: 100px;
+        height: 100px;
+    }
+}

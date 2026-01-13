@@ -1,0 +1,6 @@
+# Valid NFC UIDs - One per line
+# Lines starting with # are comments
+123456789
+04A1B2C3D4E5F6
+AABBCCDD
+DEADBEEF

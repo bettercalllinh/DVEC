@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Damn Vulnerable EV Charger</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <!-- QRCode.js (browser version) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Welcome Screen -->
+        <div id="screen-welcome" class="screen active">
+            <div class="logo-container">
+                <img src="/static/images/FPT.svg" alt="FPT Logo" class="logo logo-fpt">
+                <img src="/static/images/SAS.png" alt="SAS Logo" class="logo logo-sas">
+            </div>
+            <h1 class="main-title">Damn Vulnerable EV Charger</h1>
+            <p class="tap-hint">Tap anywhere to start</p>
+        </div>
+
+        <!-- Authentication Screen -->
+        <div id="screen-auth" class="screen">
+            <div class="auth-container">
+                <div class="auth-method">
+                    <img src="/static/images/NFC.png" alt="NFC" class="auth-icon">
+                    <p class="auth-text">Swipe your card</p>
+                </div>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                <div class="auth-method">
+                    <div id="qr-code"></div>
+                    <p class="auth-text">Scan the QR code</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Failed Screen -->
+        <div id="screen-auth-failed" class="screen">
+            <div class="status-container failed">
+                <div class="status-icon">&#10060;</div>
+                <h2>Authentication Failed</h2>
+                <p>Invalid card. Please try again.</p>
+            </div>
+        </div>
+
+        <!-- Ready to Charge Screen -->
+        <div id="screen-ready" class="screen">
+            <div class="status-container success">
+                <div class="charging-icon">
+                    <svg viewBox="0 0 100 100" class="bolt-icon">
+                        <polygon points="55,5 25,50 45,50 35,95 75,40 55,40" fill="#16a34a"/>
+                    </svg>
+                </div>
+                <h2>Ready to Charge</h2>
+                <p>Please plug in your vehicle</p>
+                <div class="charging-animation">
+                    <div class="pulse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

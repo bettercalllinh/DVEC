@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EV Charger - Payment</title>
+    <link rel="stylesheet" href="/static/css/payment.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Payment Screen (shown first) -->
+        <div class="screen active" id="screen-payment">
+            <div class="payment-card">
+                <div class="payment-header">
+                    <div class="logo-container">
+                        <img src="/static/images/FPT.svg" alt="FPT Logo" class="logo logo-fpt">
+                        <img src="/static/images/SAS.png" alt="SAS Logo" class="logo logo-sas">
+                    </div>
+                    <div class="header-title">
+                        <div class="ev-icon-wrapper">
+                            <svg viewBox="0 0 40 40" class="ev-icon">
+                                <circle cx="20" cy="20" r="18" fill="#4CAF50" opacity="0.15"/>
+                                <polygon points="22,8 12,22 18,22 16,32 28,16 22,16" fill="#4CAF50"/>
+                            </svg>
+                        </div>
+                        <h1>Place a deposit to<br>start charging</h1>
+                    </div>
+                </div>
+
+                <div class="amount-box">
+                    <span class="amount-label">Deposit Required</span>
+                    <span class="amount-value">$20.00</span>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Expiry</label>
+                            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="cvv" placeholder="123" maxlength="3">
+                        </div>
+                    </div>
+
+                    <!-- THE VULNERABLE HIDDEN FIELD -->
+                    <input type="hidden" id="payment-amount" name="amount" value="20">
+
+                    <button type="button" class="btn-pay" id="btn-pay">
+                        Pay $20.00
+                    </button>
+                </div>
+
+                <div class="flaw-cta">
+                    <div class="flaw-divider">
+                        <span>or</span>
+                    </div>
+                    <button class="btn-flaw" id="btn-start-lab">
+                        <span class="flaw-icon">&#128270;</span>
+                        <span class="flaw-text">This payment portal has a flaw.<br>Wanna try to find it?</span>
+                    </button>
+                </div>
+
+                <div class="security-badges">
+                    <span class="badge">&#9989; PCI Compliant</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Introduction -->
+        <div class="screen" id="screen-lab-intro">
+            <div class="lab-card">
+                <div class="progress-bar">
+                    <div class="progress-step active" data-step="1">1</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2">2</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="3">3</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="4">4</div>
+                </div>
+
+                <div class="lab-header">
+                    <span class="lab-badge">Security Lab</span>
+                    <h2>Free Charging Exploit</h2>
+                </div>
+
+                <div class="lab-content">
+                    <div class="info-box scenario">
+                        <h3>&#127919; The Goal</h3>
+                        <p>This EV charger requires a <strong>$20 deposit</strong> to start charging. Find a way to <strong>pay $0</strong> and charge for free!</p>
+                    </div>
+
+                    <div class="info-box hint">
+                        <h3>&#128161; Hint</h3>
+                        <p>Web apps sometimes trust client-side data without proper server validation...</p>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="btn-start-challenge">
+                    Start Challenge &rarr;
+                </button>
+            </div>
+        </div>
+
+        <!-- Lab Step: Discovery -->
+        <div class="screen" id="screen-lab-discovery">
+            <div class="lab-card">
+                <div class="progress-bar">
+                    <div class="progress-step completed" data-step="1">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step active" data-step="2">2</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="3">3</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="4">4</div>
+                </div>
+
+                <div class="lab-header">
+                    <span class="lab-badge">Step 1</span>
+                    <h2>Find the Vulnerability</h2>
+                </div>
+
+                <div class="lab-content">
+                    <div class="instruction-box">
+                        <h3>Open Developer Tools</h3>
+                        <p>On mobile: Use remote debugging or desktop browser</p>
+                        <p>On desktop: Press <kbd>F12</kbd> or <kbd>Cmd+Opt+I</kbd></p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <h3>Inspect the Form</h3>
+                        <ol>
+                            <li>Go to <strong>Elements</strong> tab</li>
+                            <li>Find the payment form</li>
+                            <li>Look for hidden input fields...</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-box">
+                        <h3>&#128269; What to Look For</h3>
+                        <pre class="code-wrap"><code>&lt;input type="hidden" id="payment-amount" name="amount" <span class="highlight">value="20"</span>&gt;</code></pre>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-secondary" id="btn-back-intro">&larr; Back</button>
+                    <button class="btn-primary" id="btn-found-it">Found it! &rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Step: Exploit -->
+        <div class="screen" id="screen-lab-exploit">
+            <div class="lab-card">
+                <div class="progress-bar">
+                    <div class="progress-step completed" data-step="1">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step completed" data-step="2">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step active" data-step="3">3</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="4">4</div>
+                </div>
+
+                <div class="lab-header">
+                    <span class="lab-badge exploit">Step 2</span>
+                    <h2>Exploit It!</h2>
+                </div>
+
+                <div class="lab-content">
+                    <div class="instruction-box exploit">
+                        <h3>Run in Console</h3>
+                        <pre class="code-wrap"><code>document.getElementById('payment-amount').value = 0;</code></pre>
+                        <button class="btn-simulate" id="btn-simulate">
+                            <span class="simulate-icon">&#9654;</span> Run Code
+                        </button>
+                        <p class="simulate-hint">Or run it manually in DevTools Console</p>
+                    </div>
+
+                    <div class="exploit-demo">
+                        <div class="demo-card">
+                            <div class="demo-amount">
+                                <span class="label">Amount</span>
+                                <span class="value" id="demo-amount-display">$20.00</span>
+                                <span class="modified-badge hidden" id="modified-badge">MODIFIED!</span>
+                            </div>
+                            <!-- Hidden field for exploit - same ID as main payment form -->
+                            <input type="hidden" id="payment-amount" name="amount" value="20">
+                            <button class="btn-pay-demo" id="btn-exploit-pay">
+                                Pay $<span id="btn-amount-text">20</span>.00
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-secondary" id="btn-back-discovery">&larr; Back</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Step: Success -->
+        <div class="screen" id="screen-lab-success">
+            <div class="lab-card success">
+                <div class="progress-bar">
+                    <div class="progress-step completed" data-step="1">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step completed" data-step="2">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step completed" data-step="3">&#10003;</div>
+                    <div class="progress-line active"></div>
+                    <div class="progress-step active" data-step="4">&#10003;</div>
+                </div>
+
+                <div class="success-header">
+                    <div class="success-icon">&#127881;</div>
+                    <h2>Exploit Successful!</h2>
+                </div>
+
+                <div class="success-stats">
+                    <div class="stat-row">
+                        <span>Original:</span>
+                        <span class="strike">$20.00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>You Paid:</span>
+                        <span class="green" id="final-paid">$0.00</span>
+                    </div>
+                    <div class="stat-row highlight">
+                        <span>Saved:</span>
+                        <span class="green" id="final-saved">$20.00</span>
+                    </div>
+                </div>
+
+                <div class="charger-active">
+                    <div class="pulse-dot"></div>
+                    <span>Charger ACTIVE - Free charging!</span>
+                </div>
+
+                <!-- Step-by-step explanation for beginners -->
+                <div class="explanation-section">
+                    <h3>&#128218; What Just Happened?</h3>
+
+                    <div class="explanation-steps">
+                        <div class="explanation-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>The Price Tag Trick</h4>
+                                <p>Imagine a store where customers can change price tags. The payment form had a hidden "price tag" (value="20") that you changed to 0.</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>The Server Trusted You</h4>
+                                <p>When you clicked "Pay", the server accepted whatever amount you sent - without checking if it was correct. It blindly trusted the customer!</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Free Charging!</h4>
+                                <p>The charger started because the server thought you paid. But you actually paid $0. This is called a <strong>client-side validation bypass</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="real-world-impact">
+                        <h4>&#127757; Real World Impact</h4>
+                        <p>This same flaw has been found in real e-commerce sites, payment systems, and IoT devices - allowing attackers to buy products for $0.01 or bypass payment entirely.</p>
+                    </div>
+                </div>
+
+                <div class="vulnerability-box">
+                    <h3>&#128736; Technical Details</h3>
+                    <p>The server trusted a client-side hidden field for the payment amount without validation.</p>
+                    <div class="code-comparison">
+                        <div class="code-bad">
+                            <span class="code-label">&#10060; Vulnerable</span>
+                            <code>amount = request.get('amount')</code>
+                        </div>
+                        <div class="code-good">
+                            <span class="code-label">&#9989; Secure</span>
+                            <code>amount = SERVER_MINIMUM</code>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="btn-restart">
+                    &#8635; Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Failure Modal -->
+        <div class="modal hidden" id="modal-failure">
+            <div class="modal-content">
+                <div class="modal-icon">&#128176;</div>
+                <h2>You paid $20!</h2>
+                <p>That's the full amount. Try modifying the hidden field first!</p>
+                <button class="btn-primary" id="btn-modal-close">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/payment.js"></script>
+</body>
+</html>
