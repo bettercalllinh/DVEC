@@ -6,9 +6,11 @@ bp = Blueprint('nfc', __name__, url_prefix='/api/nfc')
 # Global queue for NFC events (for polling)
 nfc_event_queue = []
 
+
 def get_valid_uids_file():
     """Get the path to valid_uid.txt"""
     return os.path.join(os.path.dirname(__file__), '..', '..', 'valid_uid.txt')
+
 
 def load_valid_uids():
     """Load valid UIDs from valid_uid.txt"""
@@ -25,12 +27,26 @@ def load_valid_uids():
     except FileNotFoundError:
         return []
 
+
 def validate_uid(uid):
     """Check if UID exists in valid_uid.txt"""
     if not uid:
         return False
     valid_uids = load_valid_uids()
     return uid.upper() in valid_uids
+
+
+def nfc_event_callback(uid, is_valid):
+    """
+    Callback function called by NFCReader when a card is detected.
+    Pushes event to the queue for frontend polling.
+    """
+    global nfc_event_queue
+    event = {
+        "type": "valid" if is_valid else "invalid",
+        "uid": uid
+    }
+    nfc_event_queue.append(event)
 
 @bp.route('/poll', methods=['GET'])
 def poll_nfc():
@@ -94,4 +110,43 @@ def get_valid_uids():
     return jsonify({
         "uids": load_valid_uids()
     })
+
+
+@bp.route('/status', methods=['GET'])
+def nfc_status():
+    """Get NFC reader hardware status"""
+    try:
+        from app.services.nfc_reader import is_hardware_available, get_reader
+        reader = get_reader()
+        return jsonify({
+            "hardware_available": is_hardware_available(),
+            "reader_running": reader.running if reader else False,
+            "valid_uids_count": len(load_valid_uids())
+        })
+    except ImportError:
+        return jsonify({
+            "hardware_available": False,
+            "reader_running": False,
+            "valid_uids_count": len(load_valid_uids()),
+            "error": "NFC reader service not available"
+        })
+
+
+@bp.route('/reload-uids', methods=['POST'])
+def reload_uids():
+    """Reload valid UIDs from file"""
+    try:
+        from app.services.nfc_reader import get_reader
+        reader = get_reader()
+        if reader:
+            reader.reload_valid_uids()
+        return jsonify({
+            "status": "ok",
+            "uids_count": len(load_valid_uids())
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
